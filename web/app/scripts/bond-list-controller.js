@@ -3,21 +3,27 @@
  * @classdesc
  * @ngInject
  */
-function BondListController($scope, $log, $interval, $uibModal, PeerService) {
+function BondListController($scope, $log, $interval, $uibModal, PeerService, $rootScope) {
 
   var ctl = this;
   
   var init = function() {
-    // ctl.list = PeerService.getBonds();
+    ctl.reload();
+    $rootScope.$on('chainblock', function(payload){
+          ctl.reload();
+    });
+  };
+
+  ctl.reload = function(){
     PeerService.getBonds().then(function(list) {
       ctl.list = list;
     });
   };
+
   
   $scope.$on('$viewContentLoaded', init);
   
-  $interval(init, 10000);
-  
+
   ctl.open = function() {
     var modalInstance = $uibModal.open({
       templateUrl: 'create-bond-modal.html',

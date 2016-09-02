@@ -9,18 +9,20 @@ function InvestorContractListController($scope, $log, $interval, $uibModal, $roo
   var ctl = this;
   
   var init = function() {
+    ctl.reload();
+    $rootScope.$on('chainblock', function(payload){
+          ctl.reload();
+    });
+  };
+
+  ctl.reload = function(){
     PeerService.getInvestorContracts().then(function(list) {
       ctl.list = list;
     });
   };
-  
+
   $scope.$on('$viewContentLoaded', init);
-  
-  if($rootScope._timer){
-    $interval.cancel($rootScope._timer);
-  }
-  $rootScope._timer = $interval(init, 2000);
-  
+
   ctl.open = function(contract) {
     var modalInstance = $uibModal.open({
       templateUrl: 'sell-contract-modal.html',

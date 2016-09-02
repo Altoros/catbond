@@ -9,18 +9,21 @@ function MarketController($scope, $log, $interval, $uibModal, $rootScope,
   var ctl = this;
   
   var init = function() {
-      PeerService.getOffers().then(function(list) {
-        ctl.list = list;
-      });
+    ctl.reload();
+    $rootScope.$on('chainblock', function(payload){
+          ctl.reload();
+    });
   };
+
+  ctl.reload = function(){
+    PeerService.getOffers().then(function(list) {
+      ctl.list = list;
+    });
+  };
+
   
   $scope.$on('$viewContentLoaded', init);
 
-  if($rootScope._timer){
-    $interval.cancel($rootScope._timer);
-  }
-  $rootScope._timer = $interval(init, 2000);
-  
   ctl.user = UserService.getUser();
   
   ctl.open = function(trade) {

@@ -6,20 +6,21 @@
 function IssuerContractListController($scope, $log, $interval, PeerService, $rootScope) {
 
   var ctl = this;
-  
-  var init = function() {
-//    ctl.list = PeerService.getIssuerContracts();
-        PeerService.getIssuerContracts().then(function(list) {
-          ctl.list = list;
-        });
-  };
-  
+
   $scope.$on('$viewContentLoaded', init);
   
-  if($rootScope._timer){
-    $interval.cancel($rootScope._timer);
-  }
-  $rootScope._timer = $interval(init, 2000);
+  var init = function() {
+    ctl.reload();
+    $rootScope.$on('chainblock', function(payload){
+          ctl.reload();
+    });
+  };
+
+  ctl.reload = function(){
+    PeerService.getIssuerContracts().then(function(list) {
+      ctl.list = list;
+    });
+  };
 
 }
 
