@@ -127,12 +127,8 @@ func (t *BondChaincode) changeContractState(stub shim.ChaincodeStubInterface, is
 	})
 }
 
-func (t *BondChaincode) changeContractOwner(stub shim.ChaincodeStubInterface, issuerId string, contractId string, newOwner string) (bool, error) {
-	log.Debugf("changeContractOwner with issuerId:%s and contractId:%s to %s", issuerId, contractId, newOwner)
-	contract_, err := t.getContract(stub, issuerId, contractId)
-	if err != nil {
-		return false, err
-	}
+func (t *BondChaincode) reserveContract(stub shim.ChaincodeStubInterface, contract_ contract, newOwner string) (bool, error) {
+	log.Debugf("reserveContract to %s", newOwner)
 
 	contract_.OwnerId = newOwner
 	contract_.State = "reserved"

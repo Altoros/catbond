@@ -13,6 +13,8 @@ var browserSync = require('browser-sync');
 var pagespeed = require('psi');
 var reload = browserSync.reload;
 
+var MyEndpoint = require('./lib/MyEndpoint.js');
+
 // Lint JavaScript
 gulp.task('jshint', function () {
   return gulp.src('app/scripts/**/*.js')
@@ -96,8 +98,12 @@ gulp.task('serve', [], function () {
     notify: false,
     logPrefix: 'gulp serve',
     server: {baseDir: 'app', index: 'app.html'},
-    port: 8103
+    port: 8104
   });
+
+  var io = createSocket();
+  trackBlockChanges(io);
+
 
   //gulp.watch(['app/**.html'], reload);*/
   gulp.watch(['app/app.html'], reload);
@@ -174,3 +180,66 @@ gulp.task('pagespeed', function (cb) {
     // key: 'YOUR_API_KEY'
   }, cb);
 });
+
+
+
+/**
+ *
+ */
+function createSocket(){
+  var http = require('http').Server();
+  var io = require('socket.io')(http);
+
+  io.on('connection', function(socket){
+    //console.log(socket);
+    console.log('[io] a new user connected');
+    // io.emit('chat_message_response',"1 New user Conencted to chat");
+
+
+    // DEBUG
+    socket.emit('chainblock', responseExample);
+
+    socket.emit('hello', 'Hi user!');
+    socket.on('hello',	function(payload) {
+      console.log('[io] client hello:', payload);
+    });
+
+    socket.on('disconnect', function(socket){
+      console.log('[io] user disconnected');
+      // io.emit('chat_message_response',"1 user disconnected.");
+    });
+
+  });
+
+  // now listen server.
+  http.listen(8156,function(){
+    console.log('[io] Socket Started Listening on Port: 8155');
+  });
+
+  return io;
+}
+
+/**
+ *
+ */
+function trackBlockChanges(/*endpoint,*/io){
+
+  // create grpc endpoint
+  var endpoint = new MyEndpoint('localhost:7053');
+
+  var stream = endpoint.createChatStream();
+  stream.on('data', message=>{
+    console.log('data:', message);
+    if(message.block){
+      io.emit('chainblock', message);
+    }
+  });
+  stream.on('error', err=>{
+    console.log('error:', err);
+
+    setTimeout(()=>{
+      trackBlockChanges(io);
+    }, 1000);
+  });
+
+}

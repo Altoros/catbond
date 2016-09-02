@@ -5,7 +5,7 @@
 # config.vm.synced_folder "/usr/local/Cellar/go/1.6/src/github.com/olegabu", "/opt/gopath/src/github.com/olegabu"
 
 cd $GOPATH/src/github.com/hyperledger/fabric/devenv/
-vagrant ssh -c /opt/gopath/src/github.com/olegabu/catbond/support/deploy_chaincode.sh
+vagrant ssh -c /opt/gopath/src/github.com/Altoros/catbond/support/deploy_chaincode.sh
 
 if [[ $? != 0 ]];
 then

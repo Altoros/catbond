@@ -124,9 +124,9 @@ function PeerService($log, $q, $http, cfg, UserService) {
 
 var encodeToBase64 = function(functionName, functionArgs) {
     functionArgs.splice(0, 0, functionName);
-    for (var i = 0; i < functionArgs.length; i++) {
-        functionArgs[i] = btoa(functionArgs[i]);
-    }
+//    for (var i = 0; i < functionArgs.length; i++) {
+//        functionArgs[i] = btoa(functionArgs[i]);
+//    }
     return functionArgs
 };
 

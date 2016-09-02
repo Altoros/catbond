@@ -8,6 +8,9 @@ import (
 
 	"encoding/json"
 	"strconv"
+	"github.com/golang/protobuf/proto"
+	pb "github.com/hyperledger/fabric/protos"
+
 )
 
 var log = logging.MustGetLogger("bond-traiding")
@@ -138,6 +141,10 @@ func (t *BondChaincode) Invoke(stub shim.ChaincodeStubInterface, function string
 // Query callback representing the query of a chaincode
 func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	log.Debugf("function: %s, args: %s", function, args)
+	array, _ := stub.GetCallerCertificate()
+	log.Debugf("certificate: args: %+v", array)
+	id, _ := t.getChainCodeId(stub)
+	log.Debugf("chaincodeId: %s", id)
 	// Handle different functions
 	if function == "getBonds" {
 		var issuerId string
@@ -156,7 +163,6 @@ func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string,
 		if len(args) != 1 {
 			return nil, errors.New("Incorrect arguments. Expecting id.")
 		}
-
 		role, err := t.getCallerRole(stub)
 		if err != nil {
 			return nil, err
@@ -191,10 +197,11 @@ func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string,
 			return nil, errors.New("Incorrect arguments. Expecting no arguments.")
 		}
 
-		role, err := t.getCallerRole(stub)
-		if err != nil {
-			return nil, err
-		}
+		role := "test"
+		//role, err := t.getCallerRole(stub)
+		//if err != nil {
+		//	return nil, err
+		//}
 
 		if role == "auditor" {
 			trades, err := t.getAllTrades(stub)
@@ -234,6 +241,22 @@ func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string,
 		return nil, errors.New("Received unknown function invocation")
 	}
 }
+
+
+func (t *BondChaincode) getChainCodeId(stub shim.ChaincodeStubInterface)(string, error){
+	chaincodeSpec := &pb.ChaincodeSpec{}
+	log.Debugf("getSpec: %+v", chaincodeSpec)
+	payload, _ :=stub.GetPayload();
+	log.Debugf("getPayload: %+v", payload)
+	unmarshalErr := proto.Unmarshal(payload, chaincodeSpec)
+	if unmarshalErr != nil {
+		log.Debugf("error: %+v", unmarshalErr)
+		return "", unmarshalErr
+	}else{
+		return chaincodeSpec.ChaincodeID.Name, nil
+	}
+}
+
 
 func (t *BondChaincode) incrementAndGetCounter(stub shim.ChaincodeStubInterface, counterName string) (result uint64, err error) {
 	if contractIDBytes, err := stub.GetState(counterName); err != nil {

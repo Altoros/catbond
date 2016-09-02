@@ -4,6 +4,7 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"errors"
 	"strconv"
+	"fmt"
 )
 
 //trades: [{
@@ -20,6 +21,11 @@ type trade struct {
 	SellerId 	string `json:"sellerId"`
 	Price 		uint64 `json:"price"`
 	State 		string `json:"state"`
+}
+
+func (t *BondChaincode) GetSwiftChaincodeToCall() string {
+	chainCodeToCall := "628f43f5117816dfcdbf2321fec2ea3edb0eac75439bb096106501ce39429baa5722b77b05b05565005401792c0c93e8e61cc9587e21c68fd062aaa6df60a1e5"
+	return chainCodeToCall
 }
 
 func (trade_ *trade) readFromRow(row shim.Row) {
@@ -127,13 +133,18 @@ func (t *BondChaincode) buy(stub shim.ChaincodeStubInterface, tradeId uint64, ne
 	}
 
 	// Transfer Contract ownership
-	if _, err := t.changeContractOwner(stub, contract_.IssuerId, contract_.Id, newOwnerId); err != nil {
+	if _, err := t.reserveContract(stub, contract_, newOwnerId); err != nil {
 		message := "Failed transfering contract ownership. Error: " + err.Error()
 		log.Error(message)
 		return nil, errors.New(message)
 	}
 
-	// TODO add money transfer
+	err = t.sendPaymentInstruction(stub, trade_, newOwnerId)
+	if err != nil {
+		errStr := fmt.Sprintf("Failed to invoke swift chaincode. Got error: %s", err.Error())
+		fmt.Printf(errStr)
+		return nil, err
+	}
 
 	// Create new trade entry with "settled" state
 	trade_.State = "reserved"
@@ -144,6 +155,35 @@ func (t *BondChaincode) buy(stub shim.ChaincodeStubInterface, tradeId uint64, ne
 
 	return nil, nil
 }
+
+func (t *BondChaincode) sendPaymentInstruction(stub shim.ChaincodeStubInterface, trade_ trade, newOwnerId string) (error) {
+	log.Debugf("payment instructions for payment:%+v", trade_)
+
+
+	var args [][]byte
+
+	args = append(args, []byte("submitPayment"))
+	args = append(args, []byte(trade_.SellerId))
+	args = append(args, []byte(newOwnerId))
+	args = append(args, []byte(strconv.FormatUint(trade_.Price, 10)))
+	args = append(args, []byte("payment"))
+	args = append(args, []byte(trade_.ContractId))
+	args = append(args, []byte("callback chaincode id"))
+	args = append(args, []byte("confirm payload"))
+	args = append(args, []byte("decline payload"))
+
+	response, err := stub.InvokeChaincode(t.GetSwiftChaincodeToCall(), args)
+	if err != nil {
+		errStr := fmt.Sprintf("Failed to invoke chaincode. Got error: %s", err.Error())
+		fmt.Printf(errStr)
+		return errors.New(errStr)
+	}
+
+	log.Debugf("Invoke chaincode successful. Got response %s", string(response))
+
+	return nil
+}
+
 
 func (t *BondChaincode) confirm(stub shim.ChaincodeStubInterface, contractId string) ([]byte, error) {
 	log.Debugf("function: %s, args: %s", "buy", contractId)

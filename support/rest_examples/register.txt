@@ -1,4 +1,0 @@
-{
-  "enrollId": "WebAppAdmin",
-  "enrollSecret": "DJY27pEnl16d"
-}

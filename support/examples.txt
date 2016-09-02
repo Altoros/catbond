@@ -1,0 +1,6 @@
+
+#get contracts
+
+curl -XPOST -d  '{"jsonrpc": "2.0", "method": "query", "params": {"type": 1, "chaincodeID": {"name": "'"$HASH"'"}, "ctorMsg": {"args": ["getContracts", "issuer0"]}, "secureContext": "auditor0", "attributes": ["role", "company"]}, "id": 1}' http://localhost:7050/chaincode
+curl -XPOST -d  '{"jsonrpc": "2.0", "method": "query", "params": {"type": 1, "chaincodeID": {"name": "'"$HASH"'"}, "ctorMsg": {"args": ["getContracts", "issuer0"]}}, "id": 1}' http://localhost:7050/chaincode
+curl -XPOST -d  '{"jsonrpc": "2.0", "method": "query", "params": {"type": 1, "chaincodeID": {"name": "'"$HASH"'"}, "ctorMsg": {"args": ["getBonds", "issuer0"]}}, "id": 1}' http://localhost:7050/chaincode
