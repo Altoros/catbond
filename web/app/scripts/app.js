@@ -9,7 +9,8 @@ angular.module('app', ['ui.router',
                        'investorContractListController',
                        'marketController',
                        'offlineController',
-                       'config'])
+                       'config',
+                       'MyBlockchain'])
 
 .config(function($stateProvider, $urlRouterProvider) {
 
