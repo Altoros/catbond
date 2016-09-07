@@ -8,21 +8,22 @@ import (
 
 	"encoding/json"
 	"strconv"
-	"github.com/golang/protobuf/proto"
-	pb "github.com/hyperledger/fabric/protos"
+	//"github.com/golang/protobuf/proto"
+	//pb "github.com/hyperledger/fabric/protos"
 
 )
 
 var log = logging.MustGetLogger("bond-traiding")
+const PRICE_PER_CONTRACT uint64 = 100000
 
 // SimpleChaincode example simple Chaincode implementation
 type BondChaincode struct {
 }
 
-type response struct {
-	State 	string `json:"state"`
-	Msg 	string `json:"message"`
-}
+//type response struct {
+//	State 	string `json:"state"`
+//	Msg 	string `json:"message"`
+//}
 
 
 func (t *BondChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
@@ -82,15 +83,16 @@ func (t *BondChaincode) Invoke(stub shim.ChaincodeStubInterface, function string
 		}
 		newBond.Term = term
 
-		// TODO check with Oleg is state should be hardcoded on a contract level
+		// TODO check with Oleg is state should be hardcoded on a contract level.
 		newBond.State = "active"
 
 		newBond.Id = newBond.IssuerId + "." + newBond.MaturityDate + "." + strconv.FormatUint(newBond.Rate, 10)
+		newBond.CouponsPaid = 0
 
 		if msg, err := t.createBond(stub, newBond); err != nil {
 			return msg, err
 		}
-		return t.createContractsForBond(stub, newBond, 5)
+		return t.createContractsForBond(stub, newBond, principal/PRICE_PER_CONTRACT)
 
 	} else if function == "buy" {
 		if len(args) != 2 {
@@ -111,6 +113,13 @@ func (t *BondChaincode) Invoke(stub shim.ChaincodeStubInterface, function string
 
 		return t.confirm(stub, args[0])
 
+	} else if function == "payContractCoupon" {
+		if len(args) != 1 {
+			return nil, errors.New("Incorrect arguments. Expecting contractId")
+		}
+
+		_, err := t.payContractCoupon(stub, args[0])
+		return nil, err
 	} else if function == "sell" {
 		if len(args) != 2 {
 			return nil, errors.New("Incorrect arguments. Expecting contractId, price.")
@@ -123,12 +132,21 @@ func (t *BondChaincode) Invoke(stub shim.ChaincodeStubInterface, function string
 
 		return t.sell(stub, args[0], price)
 
-	} else if function == "couponsPaid" {
+	} else if function == "payCoupons" {
 		if len(args) != 2 {
 			return nil, errors.New("Incorrect arguments. Expecting issuerId, bondId.")
 		}
 		// TODO: add role check
-		return t.couponsPaid(stub, args[0], args[1])
+		t.removeExpiredBonds(stub)
+		return t.payCoupons(stub)
+
+	} else if function == "setChainCodeId" {
+		if len(args) != 1 {
+			return nil, errors.New("Incorrect arguments. Expecting chaincodeID.")
+		}
+		error := stub.PutState("chaincodeid", []byte(args[0]))
+
+		return nil, error
 
 	} else {
 		log.Errorf("function: %s, args: %s", function, args)
@@ -143,7 +161,7 @@ func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string,
 	log.Debugf("function: %s, args: %s", function, args)
 	array, _ := stub.GetCallerCertificate()
 	log.Debugf("certificate: args: %+v", array)
-	id, _ := t.getChainCodeId(stub)
+	id, _ := t.getChaincodeId(stub)
 	log.Debugf("chaincodeId: %s", id)
 	// Handle different functions
 	if function == "getBonds" {
@@ -197,11 +215,10 @@ func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string,
 			return nil, errors.New("Incorrect arguments. Expecting no arguments.")
 		}
 
-		role := "test"
-		//role, err := t.getCallerRole(stub)
-		//if err != nil {
-		//	return nil, err
-		//}
+		role, err := t.getCallerRole(stub)
+		if err != nil {
+			return nil, err
+		}
 
 		if role == "auditor" {
 			trades, err := t.getAllTrades(stub)
@@ -219,23 +236,23 @@ func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string,
 			return json.Marshal(trades)
 		}
 
-	} else if function == "verifyBuyRequest" {
-		if len(args) != 2 {
-			return nil, errors.New("Incorrect arguments. Expecting 2 arguments: contractId and price")
-		}
-		contractId := args[0]
-		price, err := strconv.ParseUint(args[1], 10, 64)
-		var msg response
-		if err != nil {
-			msg.State = "ERROR"
-			msg.Msg = "cannot incorrect price"
-			log.Debugf("incorrect price: %+v", err)
-		}else {
-			log.Debugf("Verify trade")
-			msg = t.verifyTradeForContract(stub, contractId, price)
-		}
-		log.Debugf("Response: %+v", msg)
-		return json.Marshal(msg)
+	//} else if function == "verifyBuyRequest" {
+	//	if len(args) != 2 {
+	//		return nil, errors.New("Incorrect arguments. Expecting 2 arguments: contractId and price")
+	//	}
+	//	contractId := args[0]
+	//	price, err := strconv.ParseUint(args[1], 10, 64)
+	//	var msg response
+	//	if err != nil {
+	//		msg.State = "ERROR"
+	//		msg.Msg = "cannot incorrect price"
+	//		log.Debugf("incorrect price: %+v", err)
+	//	}else {
+	//		log.Debugf("Verify trade")
+	//		msg = t.verifyTradeForContract(stub, contractId, price)
+	//	}
+	//	log.Debugf("Response: %+v", msg)
+	//	return json.Marshal(msg)
 	} else {
 		log.Errorf("function: %s, args: %s", function, args)
 		return nil, errors.New("Received unknown function invocation")
@@ -243,19 +260,19 @@ func (t *BondChaincode) Query(stub shim.ChaincodeStubInterface, function string,
 }
 
 
-func (t *BondChaincode) getChainCodeId(stub shim.ChaincodeStubInterface)(string, error){
-	chaincodeSpec := &pb.ChaincodeSpec{}
-	log.Debugf("getSpec: %+v", chaincodeSpec)
-	payload, _ :=stub.GetPayload();
-	log.Debugf("getPayload: %+v", payload)
-	unmarshalErr := proto.Unmarshal(payload, chaincodeSpec)
-	if unmarshalErr != nil {
-		log.Debugf("error: %+v", unmarshalErr)
-		return "", unmarshalErr
-	}else{
-		return chaincodeSpec.ChaincodeID.Name, nil
-	}
-}
+//func (t *BondChaincode) getChainCodeId(stub shim.ChaincodeStubInterface)(string, error){
+//	chaincodeSpec := &pb.ChaincodeSpec{}
+//	log.Debugf("getSpec: [% x]", chaincodeSpec)
+//	payload, _ :=stub.GetPayload();
+//	log.Debugf("getPayload: [% x]", string(payload[:]))
+//	unmarshalErr := proto.Unmarshal(payload, chaincodeSpec)
+//	if unmarshalErr != nil {
+//		log.Debugf("error: %+v", unmarshalErr)
+//		return "", unmarshalErr
+//	}else{
+//		return chaincodeSpec.ChaincodeID.Name, nil
+//	}
+//}
 
 
 func (t *BondChaincode) incrementAndGetCounter(stub shim.ChaincodeStubInterface, counterName string) (result uint64, err error) {
@@ -282,8 +299,13 @@ func (t *BondChaincode) getCallerCompany(stub shim.ChaincodeStubInterface) (stri
 	log.Debugf("Caller company is: %s", callerCompany)
 	return string(callerCompany), nil
 }
+func (t *BondChaincode) getChaincodeId(stub shim.ChaincodeStubInterface) (string, error) {
+	chaincodeid, err := stub.GetState("chaincodeid")
+	return string(chaincodeid), err
+}
 
 func (t *BondChaincode) getCallerRole(stub shim.ChaincodeStubInterface) (string, error) {
+
 	callerRole, err := stub.ReadCertAttribute("role")
 	if err != nil {
 		log.Error("Failed fetching caller role. Error: " + err.Error())
@@ -296,6 +318,6 @@ func (t *BondChaincode) getCallerRole(stub shim.ChaincodeStubInterface) (string,
 func main() {
 	err := shim.Start(new(BondChaincode))
 	if err != nil {
-		log.Critical("Error starting InsuranceFrontingChaincode: %s", err)
+		log.Critical("Error starting CatbondChaincode: %s", err)
 	}
 }

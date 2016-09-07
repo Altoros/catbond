@@ -16,7 +16,7 @@ function InvestorContractListController($scope, $log, $interval, $uibModal, $roo
   };
 
   ctl.reload = function(){
-    PeerService.getInvestorContracts().then(function(list) {
+    PeerService.getIssuerContracts().then(function(list) {
       ctl.list = list;
     });
   };

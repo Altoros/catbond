@@ -3,13 +3,12 @@ angular.module('config', [])
     {
   endpoint: 'http://localhost:7050/chaincode',
   secureContext: 'user_type1_deadbeef',
-  chaincodeID: "dee87f4eb151fd04a60bb39bf0b0508644cb8ba0b71f9cfec5370e3f1a999c975e62badde75896948dbac01f13ca71c5dd3eadb317703cea5d5d05e631c67292",
+  chaincodeID: "b7fc95aa8be8dce499af84fad50162a7adb898ee63135e32442ea2238b62c23a875369e8c78a6f2e2b01f57f8530b62c1866b11aa42b349c32cbf1b4cde05d91",
   users: [{id: 'issuer0', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
           {id: 'issuer1', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
           {id: 'investor0', role: 'investor', endpoint:'http://localhost:7050/chaincode'},
           {id: 'investor1', role: 'investor', endpoint:'http://localhost:7050/chaincode'},
-          {id: 'auditor0', role: 'auditor', endpoint:'http://localhost:7050/chaincode'},
-          {id: 'offlineServices', role: 'bank', endpoint:'http://localhost:7050/chaincode'}],
+          {id: 'auditor0', role: 'auditor', endpoint:'http://localhost:7050/chaincode'}],
   triggers: ['hurricane 2 FL', 'earthquake 5 CA'],
   bonds: [{
             id: 'issuer0.2017.6.13.600',

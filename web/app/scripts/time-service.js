@@ -20,9 +20,11 @@ function TimeService($log, $interval, cfg, PeerService, localStorageService) {
     // call monthly function
     addTime();
 
-    PeerService.getAllBonds().then(function(list) {
-        processCoupons(list);
-    });
+    PeerService.payCoupons();
+
+//    PeerService.getAllBonds().then(function(list) {
+//        processCoupons(list);
+//    });
 
   };
 

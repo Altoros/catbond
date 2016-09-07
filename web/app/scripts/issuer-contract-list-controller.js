@@ -7,8 +7,7 @@ function IssuerContractListController($scope, $log, $interval, PeerService, $roo
 
   var ctl = this;
 
-  $scope.$on('$viewContentLoaded', init);
-  
+
   var init = function() {
     ctl.reload();
     $rootScope.$on('chainblock', function(payload){
@@ -22,6 +21,7 @@ function IssuerContractListController($scope, $log, $interval, PeerService, $roo
     });
   };
 
+  $scope.$on('$viewContentLoaded', init);
 }
 
 angular.module('issuerContractListController', [])

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"fmt"
 )
 
 type contract struct {
@@ -101,6 +102,31 @@ func (t *BondChaincode) getContract(stub shim.ChaincodeStubInterface, issuerId s
 	return result, nil
 }
 
+func (t *BondChaincode) archiveContract(stub shim.ChaincodeStubInterface, contract_ contract) (error) {
+
+	trade_, err := t.getTradeForContract(stub, contract_.Id, "")
+	if err != nil {
+		return fmt.Errorf("archiveContract operation failed. cannot get trade %s", err)
+	}
+	err = t.archiveTrade(stub, trade_.Id)
+	if err != nil {
+		return err
+	}
+
+	var columns []shim.Column
+	columnIssuerIDs := shim.Column{Value: &shim.Column_String_{String_: contract_.IssuerId}}
+	columns = append(columns, columnIssuerIDs)
+	columnID := shim.Column{Value: &shim.Column_String_{String_: contract_.Id}}
+	columns = append(columns, columnID)
+
+	err = stub.DeleteRow("Contracts", columns)
+	if err != nil {
+		return fmt.Errorf("archiveContract operation failed. %s", err)
+	}
+
+	return nil
+}
+
 func (t *BondChaincode) getContractById(stub shim.ChaincodeStubInterface, contractId string) (contract, error) {
 	// TODO: check this method
 	bondId := strings.Split(contractId, ".")[0]
@@ -143,8 +169,15 @@ func (t *BondChaincode) reserveContract(stub shim.ChaincodeStubInterface, contra
 }
 
 
-func (t *BondChaincode) payContractCoupon(stub shim.ChaincodeStubInterface, contract_ contract) (bool, error) {
-	log.Debugf("payContractCoupon for: %+v", contract_)
+func (t *BondChaincode) payContractCoupon(stub shim.ChaincodeStubInterface, contractId string) (bool, error) {
+	log.Debugf("payContractCoupon for: %s", contractId)
+
+	contract_, err := t.getContractById(stub, contractId)
+
+	if err != nil {
+		log.Error("payContractCoupon failed on retrieving contract: " + err.Error())
+		return false, err
+	}
 
 	contract_.CouponsPaid++
 	return stub.ReplaceRow("Contracts", shim.Row{

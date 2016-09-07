@@ -31,7 +31,7 @@ function PeerService($log, $q, $http, cfg, UserService) {
   };
 
   PeerService.payCoupons = function(issuerId, bondId) {
-    return invoke('couponsPaid', [issuerId, bondId])
+    return invoke('payCoupons', [issuerId, bondId])
   };
 
   PeerService.verify = function(description, price) {

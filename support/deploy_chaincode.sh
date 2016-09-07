@@ -47,7 +47,7 @@ peer network login offlineServices -p H80SiB5ODKKQ
 echo "Deploying chaincode..."
 
 #OUTPUT="$(peer chaincode deploy -p github.com/olegabu/catbond/chaincode -c '{"Args": ["aW5pdA=="]}' -u auditor0)"
-OUTPUT="$(curl -XPOST -d  '{"jsonrpc": "2.0", "method": "deploy",  "params": {"type": 1,"chaincodeID": {"path": "github.com/Altoros/catbond/chaincode","language": "GOLANG"}, "ctorMsg": { "args": ["init"] },"secureContext": "auditor0", "attributes": ["role"]},"id": 0}' http://localhost:7050/chaincode)"
+OUTPUT="$(curl -XPOST -d  '{"jsonrpc": "2.0", "method": "deploy",  "params": {"type": 1,"chaincodeID": {"path": "github.com/Altoros/catbond/chaincode","language": "GOLANG"}, "ctorMsg": { "args": ["init", "test"] },"secureContext": "auditor0", "attributes": ["role"]},"id": 0}' http://localhost:7050/chaincode)"
 #sudo apt-get install jq
 OUTPUT="$(echo $OUTPUT | jq '.result.message')"
 
