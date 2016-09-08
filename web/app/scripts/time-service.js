@@ -36,7 +36,7 @@ function TimeService($log, $interval, cfg, PeerService, localStorageService) {
       stop = undefined;
     }
     else {
-      stop = $interval(TimeService.tick, 2 * 1000);
+      stop = $interval(TimeService.tick, 5 * 1000);
     }
   };
 
