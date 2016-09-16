@@ -14,6 +14,7 @@ type contract struct {
 	OwnerId        string `json:"ownerId"`
 	CouponsPaid    uint64 `json:"couponsPaid"`
 	State          string `json:"state"`
+	BondId	       string `json:"bondid"`
 }
 
 func (contract_ *contract) readFromRow(row shim.Row) {
@@ -22,6 +23,8 @@ func (contract_ *contract) readFromRow(row shim.Row) {
 	contract_.OwnerId 	= row.Columns[2].GetString_()
 	contract_.CouponsPaid 	= row.Columns[3].GetUint64()
 	contract_.State 	= row.Columns[4].GetString_()
+	contract_.BondId	= row.Columns[5].GetString_()
+
 }
 
 func (t *BondChaincode) initContracts(stub shim.ChaincodeStubInterface) (error) {
@@ -32,6 +35,7 @@ func (t *BondChaincode) initContracts(stub shim.ChaincodeStubInterface) (error) 
 		&shim.ColumnDefinition{Name: "OwnerId", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "CouponsPaid", Type: shim.ColumnDefinition_UINT64, Key: false},
 		&shim.ColumnDefinition{Name: "State", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "BondId", Type: shim.ColumnDefinition_STRING, Key: false},
 	})
 	if err != nil {
 		log.Criticalf("Cannot initialize Contracts")
@@ -48,7 +52,7 @@ func (t *BondChaincode) createContractsForBond(stub shim.ChaincodeStubInterface,
 		return nil, errors.New("Wrong number of contracts to create for bond.")
 	}
 
-	contract_ := contract{IssuerId: bond_.IssuerId, OwnerId: bond_.IssuerId, State: "offer"}
+	contract_ := contract{IssuerId: bond_.IssuerId, OwnerId: bond_.IssuerId, State: "offer", BondId:bond_.Id}
 	for numberOfContracts > 0 {
 		numberOfContracts--
 		contract_.Id = bond_.Id + "." + strconv.FormatUint(numberOfContracts, 10)
@@ -73,7 +77,8 @@ func (t *BondChaincode) createContract(stub shim.ChaincodeStubInterface, contrac
 			&shim.Column{Value: &shim.Column_String_{String_: contract_.Id}},
 			&shim.Column{Value: &shim.Column_String_{String_: contract_.OwnerId}},
 			&shim.Column{Value: &shim.Column_Uint64{Uint64: contract_.CouponsPaid}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}}},
+			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}},
+			&shim.Column{Value: &shim.Column_String_{String_: contract_.BondId}}},
 	}); !ok {
 		log.Error("Failed inserting new contract: " + err.Error())
 		return nil, err
@@ -135,38 +140,49 @@ func (t *BondChaincode) getContractById(stub shim.ChaincodeStubInterface, contra
 	return t.getContract(stub, issuerId, contractId)
 }
 
-func (t *BondChaincode) changeContractState(stub shim.ChaincodeStubInterface, issuerId string, contractId string, newState string) (bool, error) {
-	log.Debugf("changeContractState with issuerId:%s and contractId:%s to %s", issuerId, contractId, newState)
-	contract_, err := t.getContract(stub, issuerId, contractId)
-	if err != nil {
-		return false, err
-	}
+func (t *BondChaincode) updateContract(stub shim.ChaincodeStubInterface, contract_ contract) (bool, error) {
+	log.Debugf("updateContract: %+v", contract_)
 
-	contract_.State = newState
 	return stub.ReplaceRow("Contracts", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: contract_.IssuerId}},
 			&shim.Column{Value: &shim.Column_String_{String_: contract_.Id}},
 			&shim.Column{Value: &shim.Column_String_{String_: contract_.OwnerId}},
 			&shim.Column{Value: &shim.Column_Uint64{Uint64: contract_.CouponsPaid}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}}},
+			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}},
+			&shim.Column{Value: &shim.Column_String_{String_: contract_.BondId}}},
 	})
 }
 
-func (t *BondChaincode) reserveContract(stub shim.ChaincodeStubInterface, contract_ contract, newOwner string) (bool, error) {
-	log.Debugf("reserveContract to %s", newOwner)
 
-	contract_.OwnerId = newOwner
-	contract_.State = "reserved"
-	return stub.ReplaceRow("Contracts", shim.Row{
-		Columns: []*shim.Column{
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.IssuerId}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.Id}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.OwnerId}},
-			&shim.Column{Value: &shim.Column_Uint64{Uint64: contract_.CouponsPaid}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}}},
-	})
-}
+//func (t *BondChaincode) changeContractState(stub shim.ChaincodeStubInterface, issuerId string, contract_ contract, newState string) (bool, error) {
+//	log.Debugf("changeContractState with issuerId:%s and contractId:%s to %s", issuerId, contract_.Id, newState)
+//
+//	contract_.State = newState
+//	return stub.ReplaceRow("Contracts", shim.Row{
+//		Columns: []*shim.Column{
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.IssuerId}},
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.Id}},
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.OwnerId}},
+//			&shim.Column{Value: &shim.Column_Uint64{Uint64: contract_.CouponsPaid}},
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}}},
+//	})
+//}
+//
+//func (t *BondChaincode) reserveContract(stub shim.ChaincodeStubInterface, contract_ contract, newOwner string) (bool, error) {
+//	log.Debugf("reserveContract to %s", newOwner)
+//
+//	contract_.OwnerId = newOwner
+//	contract_.State = "reserved"
+//	return stub.ReplaceRow("Contracts", shim.Row{
+//		Columns: []*shim.Column{
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.IssuerId}},
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.Id}},
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.OwnerId}},
+//			&shim.Column{Value: &shim.Column_Uint64{Uint64: contract_.CouponsPaid}},
+//			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}}},
+//	})
+//}
 
 
 func (t *BondChaincode) payContractCoupon(stub shim.ChaincodeStubInterface, contractId string) (bool, error) {
@@ -180,14 +196,7 @@ func (t *BondChaincode) payContractCoupon(stub shim.ChaincodeStubInterface, cont
 	}
 
 	contract_.CouponsPaid++
-	return stub.ReplaceRow("Contracts", shim.Row{
-		Columns: []*shim.Column{
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.IssuerId}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.Id}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.OwnerId}},
-			&shim.Column{Value: &shim.Column_Uint64{Uint64: contract_.CouponsPaid}},
-			&shim.Column{Value: &shim.Column_String_{String_: contract_.State}}},
-	})
+	return t.updateContract(stub, contract_)
 }
 
 func (t *BondChaincode) getIssuerContracts(stub shim.ChaincodeStubInterface, issuerId string) (contracts []contract, err error) {

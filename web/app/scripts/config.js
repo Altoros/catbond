@@ -3,7 +3,12 @@ angular.module('config', [])
     {
   endpoint: 'http://localhost:7050/chaincode',
   secureContext: 'user_type1_deadbeef',
-  chaincodeID: "b7fc95aa8be8dce499af84fad50162a7adb898ee63135e32442ea2238b62c23a875369e8c78a6f2e2b01f57f8530b62c1866b11aa42b349c32cbf1b4cde05d91",
+  chaincodeID: "32e8308c13e647f8e430096e148a767cf22376fa76a519f5fdfe8c5758154ab03650b87e65ff7148b5289f7d9bdb9c7b7c829be7c7564a9abf512124a0b337a3",
+//  users: [{id: 'issuer0', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
+//          {id: 'issuer1', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
+//          {id: 'investor0', role: 'investor', endpoint:'http://localhost:7050/chaincode'},
+//          {id: 'investor1', role: 'investor', endpoint:'http://localhost:7050/chaincode'},
+//          {id: 'auditor0', role: 'auditor', endpoint:'http://localhost:7050/chaincode'}],
   users: [{id: 'issuer0', role: 'issuer', endpoint:'http://catbond.altoros.com:7050/chaincode'},
           {id: 'issuer1', role: 'issuer', endpoint:'http://catbond.altoros.com:7050/chaincode'},
           {id: 'investor0', role: 'investor', endpoint:'http://swift.altoros.com:7050/chaincode'},

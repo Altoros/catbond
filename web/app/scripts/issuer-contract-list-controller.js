@@ -16,7 +16,7 @@ function IssuerContractListController($scope, $log, $interval, PeerService, $roo
   };
 
   ctl.reload = function(){
-    PeerService.getIssuerContracts().then(function(list) {
+    PeerService.getContracts().then(function(list) {
       ctl.list = list;
     });
   };

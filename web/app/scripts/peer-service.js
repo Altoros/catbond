@@ -16,22 +16,22 @@ function PeerService($log, $q, $http, cfg, UserService) {
           name: cfg.chaincodeID
         },
         'ctorMsg': {},
-        "attributes": ["role"]
+        "attributes": ["role", "name"]
       },
       'id': 0
   };
 
 
   PeerService.buy = function(tradeId) {
-    return invoke('buy', ['' + tradeId, UserService.getUser().id]);
+    return invoke('buy', ['' + tradeId]);
   };
 
   PeerService.confirm = function(contractId) {
     return invoke('confirm', [ contractId])
   };
 
-  PeerService.payCoupons = function(issuerId, bondId) {
-    return invoke('payCoupons', [issuerId, bondId])
+  PeerService.payCoupons = function() {
+    return invokeSystem('payCoupons', [])
   };
 
   PeerService.verify = function(description, price) {
@@ -48,16 +48,12 @@ function PeerService($log, $q, $http, cfg, UserService) {
   };
 
 
-  PeerService.getIssuerContracts = function() {
-    return query('getContracts', [UserService.getUser().id]);
-  };
-
-  PeerService.getInvestorContracts = function() {
-    return query('getContracts', [UserService.getUser().id]);
+  PeerService.getContracts = function() {
+    return query('getContracts', []);
   };
 
   PeerService.getBonds = function() {
-    return query('getBonds', [UserService.getUser().id]);
+    return query('getBonds', []);
   };
 
   PeerService.getAllBonds = function() {
@@ -66,7 +62,7 @@ function PeerService($log, $q, $http, cfg, UserService) {
 
   PeerService.createBond = function(bond) {
     bond.maturityDate = getMaturityDateString(bond.term);
-    return invoke('createBond', [UserService.getUser().id, getMaturityDateString(bond.term),
+    return invoke('createBond', [getMaturityDateString(bond.term),
       '' + bond.principal, '' + bond.rate, '' + bond.term]);
   };
 
@@ -78,6 +74,20 @@ function PeerService($log, $q, $http, cfg, UserService) {
 //    payload.params.ctorMsg['function'] = functionName;
     payload.params.ctorMsg.args = encodeToBase64(functionName, functionArgs);
     payload.params.secureContext = UserService.getUser().id;
+
+    $log.debug('payload', payload);
+
+    return $http.post(UserService.getUser().endpoint, angular.copy(payload)).then(function(data) {
+      $log.debug('result', data.data.result);
+    });
+  };
+
+  var invokeSystem = function(functionName, functionArgs) {
+    $log.debug('PeerService.invoke');
+
+    payload.method = 'invoke';
+    payload.params.ctorMsg.args = encodeToBase64(functionName, functionArgs);
+    payload.params.secureContext = "system";
 
     $log.debug('payload', payload);
 

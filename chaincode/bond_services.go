@@ -7,16 +7,6 @@ import (
 	"fmt"
 )
 
-//issuerId: 'issuer0',
-//id: 'issuer0.2017.6.13.600',
-//principal: 500000,
-//term: 12,
-//maturityDate: '2017.6.13',
-//rate: 600,
-//trigger: 'hurricane 2 FL',
-//state: 'offer'
-
-
 type bond struct {
 	IssuerId       string `json:"issuerId"`
 	Id             string `json:"id"`
@@ -186,35 +176,6 @@ func (t *BondChaincode) createBond(stub shim.ChaincodeStubInterface, bond_ bond)
 	return nil, nil
 }
 
-//func (t *BondChaincode) couponsPaid(stub shim.ChaincodeStubInterface, issuerId string, bondId string) ([]byte, error) {
-//	log.Debugf("couponsPaid called with issuerId:%s, bondId:%s", issuerId, bondId)
-//
-//	// Get all contracts issued by issuerId
-//	contracts, err := t.getIssuerContracts(stub, issuerId)
-//	if err != nil {
-//		log.Error("couponsPaid failed on retrieving contracts: " + err.Error())
-//		return nil, err
-//	}
-//
-//	// Iterate over the contracts and increment those that match bondId
-//	matchCounter := 0
-//	for _, contract_ := range contracts {
-//		// "issuer0.2017.6.13.600" expected after trimming a suffix from "issuer0.2017.6.13.600.42"
-//		if bondId == contract_.Id[:strings.LastIndex(contract_.Id, ".")] && contract_.State=="active"  {
-//			matchCounter++
-//			if _, err := t.payContractCoupon(stub, contract_); err != nil {
-//				log.Errorf("couponsPaid failed on paying coupon for %s: %s", contract_.Id, err.Error())
-//				return nil, err
-//			}
-//		}
-//	}
-//	log.Debugf("couponsPaid: %d out of %d issued by %s matched %s and were paid",
-//		   matchCounter, len(contracts), issuerId, bondId)
-//
-//	return nil, nil
-//}
-
-
 func (t *BondChaincode) payCoupons(stub shim.ChaincodeStubInterface) ([]byte, error) {
 	log.Debugf("couponsPaid called ")
 
@@ -238,7 +199,13 @@ func (t *BondChaincode) payCoupons(stub shim.ChaincodeStubInterface) ([]byte, er
 				log.Error("cannot load bond for contract: " + err.Error())
 				continue
 			}
-			price := (PRICE_PER_CONTRACT / bond.Term) + (PRICE_PER_CONTRACT / bond.Term ) * uint64((bond.Rate / 100.0) / 12.0)
+			var price uint64;
+			if bond.Term == bond.CouponsPaid + 1 {
+				price = PRICE_PER_CONTRACT  + uint64((float64(PRICE_PER_CONTRACT) / 100.0 ) * (float64(bond.Rate) / 100.0 / 12.0))
+
+			}else{
+				price = uint64((float64(PRICE_PER_CONTRACT) / 100.0 ) * (float64(bond.Rate) / 100.0 / 12.0))
+			}
 			t.submitPaymentInstruction(stub, contract_.IssuerId, contract_.OwnerId, price, "coupon", contract_.Id, "payContractCoupon", contract_.Id)
 		}
 	}
@@ -292,8 +259,6 @@ func (t *BondChaincode) recordCouponPayment(stub shim.ChaincodeStubInterface) (e
 			log.Error("Failed inserting CouponsPaid number: " + err.Error())
 			return err
 		}
-
 	}
-
 	return nil
 }

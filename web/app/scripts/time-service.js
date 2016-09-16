@@ -22,10 +22,6 @@ function TimeService($log, $interval, cfg, PeerService, localStorageService) {
 
     PeerService.payCoupons();
 
-//    PeerService.getAllBonds().then(function(list) {
-//        processCoupons(list);
-//    });
-
   };
 
   var stop;

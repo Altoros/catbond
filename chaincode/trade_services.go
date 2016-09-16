@@ -24,7 +24,7 @@ type trade struct {
 }
 
 func (t *BondChaincode) GetSwiftChaincodeToCall() string {
-	chainCodeToCall := "823c5031c771067239dcedffed1f63c25800e13c61b242c573b2d77ac2efa73ab2cfc4a85d5d989c4290c0a0b19cdf958e30c8c645763ac057e917b81d15ec88"
+	chainCodeToCall := "1f8052f0a64a12bb4f59cd5b5cd916fa7fe1aee929cf629c0e0f6eabb9d7f819c7cb5d39ad965e2c658d6e63c344fd7e655ff400ee34390e66650d60dabc2b64"
 	return chainCodeToCall
 }
 
@@ -105,17 +105,24 @@ func (t *BondChaincode) createTradeForContract(stub shim.ChaincodeStubInterface,
 		return nil, err
 	}
 
-	_, err = t.changeContractState(stub, contract_.IssuerId, contract_.Id, "offer")
+	contract_.State = "offer"
+
+	_, err = t.updateContract(stub, contract_)
 	return nil, err
 }
 
-func (t *BondChaincode) sell(stub shim.ChaincodeStubInterface, contractId string, price uint64) ([]byte, error) {
+func (t *BondChaincode) sell(stub shim.ChaincodeStubInterface, contractId string, price uint64, callerName string) ([]byte, error) {
 	log.Debugf("function: %s, args: %s", "sell", contractId)
 
 	// Get Contract
 	contract_, err := t.getContractById(stub, contractId)
 	if err != nil {
 		message := "Failed retrieving contract. Error: " + err.Error()
+		log.Error(message)
+		return nil, errors.New(message)
+	}
+	if callerName != contract_.OwnerId{
+		message := "Only owner can sell contract"
 		log.Error(message)
 		return nil, errors.New(message)
 	}
@@ -148,7 +155,9 @@ func (t *BondChaincode) buy(stub shim.ChaincodeStubInterface, tradeId uint64, ne
 	}
 
 	// Transfer Contract ownership
-	if _, err := t.reserveContract(stub, contract_, newOwnerId); err != nil {
+	contract_.OwnerId = newOwnerId
+	contract_.State = "reserved"
+	if _, err := t.updateContract(stub, contract_); err != nil {
 		message := "Failed transfering contract ownership. Error: " + err.Error()
 		log.Error(message)
 		return nil, errors.New(message)
@@ -171,36 +180,6 @@ func (t *BondChaincode) buy(stub shim.ChaincodeStubInterface, tradeId uint64, ne
 	return nil, nil
 }
 
-func (t *BondChaincode) sendPaymentInstruction(stub shim.ChaincodeStubInterface, trade_ trade, newOwnerId string) (error) {
-	log.Debugf("payment instructions for payment:%+v", trade_)
-
-
-	var args [][]byte
-
-	args = append(args, []byte("submitPayment"))
-	args = append(args, []byte(newOwnerId))
-	args = append(args, []byte(trade_.SellerId))
-	//  1000 * trade_.Price =  ( 100000 / 100 ) * trade_.Price
-	args = append(args, []byte(strconv.FormatUint(1000 * trade_.Price , 10)))
-	args = append(args, []byte("payment"))
-	args = append(args, []byte(trade_.ContractId))
-	chainId, _ := t.getChaincodeId(stub)
-	args = append(args, []byte(chainId))
-	args = append(args, []byte("confirm"))
-	args = append(args, []byte(trade_.ContractId))
-
-	response, err := stub.InvokeChaincode(t.GetSwiftChaincodeToCall(), args)
-	if err != nil {
-		errStr := fmt.Sprintf("Failed to invoke chaincode. Got error: %s", err.Error())
-		fmt.Printf(errStr)
-		return errors.New(errStr)
-	}
-
-	log.Debugf("Invoke chaincode successful. Got response %s", string(response))
-
-	return nil
-}
-
 
 func (t *BondChaincode) confirm(stub shim.ChaincodeStubInterface, contractId string) ([]byte, error) {
 	log.Debugf("function: %s, args: %s", "buy", contractId)
@@ -220,8 +199,9 @@ func (t *BondChaincode) confirm(stub shim.ChaincodeStubInterface, contractId str
 		return nil, errors.New(message)
 	}
 
-	// Transfer Contract ownership
-	if _, err := t.changeContractState(stub, contract_.IssuerId, contract_.Id, "active"); err != nil {
+	// Confirm Contract ownership
+	contract_.State = "active"
+	if _, err := t.updateContract(stub, contract_); err != nil {
 		message := "Failed transfering contract ownership. Error: " + err.Error()
 		log.Error(message)
 		return nil, errors.New(message)
@@ -238,21 +218,7 @@ func (t *BondChaincode) confirm(stub shim.ChaincodeStubInterface, contractId str
 }
 
 func (t *BondChaincode) getAllTrades(stub shim.ChaincodeStubInterface) (trades []trade, err error) {
-	rows, err := stub.GetRows("Trades", []shim.Column{})
-	if err != nil {
-		message := "Failed retrieving trades. Error: " + err.Error()
-		log.Error(message)
-		return nil, errors.New(message)
-	}
-
-	for row := range rows {
-		var result trade
-		result.readFromRow(row)
-		log.Debugf("getOfferTrades result includes: %+v", result)
-		trades = append(trades, result)
-	}
-
-	return trades, nil
+	return t.getTradesByType(stub, "")
 }
 
 func (t *BondChaincode) getTradesByType(stub shim.ChaincodeStubInterface, state string) (trades []trade, err error) {
@@ -266,7 +232,7 @@ func (t *BondChaincode) getTradesByType(stub shim.ChaincodeStubInterface, state 
 	for row := range rows {
 		var result trade
 		result.readFromRow(row)
-		if result.State != state {
+		if state != "" && result.State != state {
 			continue
 		}
 		log.Debugf("getOfferTrades result includes: %+v", result)
@@ -317,25 +283,3 @@ func (t *BondChaincode) getTradeForContract(stub shim.ChaincodeStubInterface, co
 	}
 	return trade{}, errors.New("No trades found for contract " + contractId)
 }
-
-//func (t *BondChaincode) verifyTradeForContract(stub shim.ChaincodeStubInterface, contractId string, price uint64) (response) {
-//	trade, err := t.getOfferTradeForContract(stub, contractId, "reserved")
-//	log.Debugf("getOfferTradeForContract returns: %+v", trade)
-//	var msg response
-//	if err != nil {
-//		msg.State = "ERROR"
-//		msg.Msg = "Payment is not confirmed."
-//		log.Debugf("contract id %s with state 'reserved' not found: %+v", contractId, err)
-//		return msg
-//	}
-//	if trade.Price == price{
-//		msg.State = "OK"
-//		msg.Msg = "Approved"
-//		log.Debugf("contract approved")
-//	}else{
-//		msg.State = "ERROR"
-//		msg.Msg = "Incorrect price"
-//		log.Debugf("contract incorrect")
-//	}
-//	return msg
-//}
