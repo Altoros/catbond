@@ -19,6 +19,8 @@ function DemoController($log, $state,
   ctl.clock = function() {
     TimeService.clock();
   };
+
+  ctl.getUser = UserService.getUser;
   
   ctl.user = UserService.getUser();
 
