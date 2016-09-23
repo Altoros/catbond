@@ -40,10 +40,10 @@ bower install
 Will download developer dependencies which may take a little while.
 
 ## Run
-The web app is built and run by `gulp`:
+The web app is built and run by `node`:
 
 ```
-gulp serve
+node index
 ```
 
 ## Deploy Chaincode

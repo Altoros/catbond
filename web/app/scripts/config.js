@@ -1,7 +1,7 @@
 angular.module('config', [])
 .constant('cfg', 
     {
-  endpoint: 'http://localhost:7050/chaincode',
+  endpoint: 'http://vp2.altoros.com:7050/chaincode',
   secureContext: 'user_type1_deadbeef',
   chaincodeID: "32e8308c13e647f8e430096e148a767cf22376fa76a519f5fdfe8c5758154ab03650b87e65ff7148b5289f7d9bdb9c7b7c829be7c7564a9abf512124a0b337a3",
 //  users: [{id: 'issuer0', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
