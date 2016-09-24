@@ -2,14 +2,16 @@
   <blockchain-log> </blockchain-log>
 </div>
 
+<h3 class="center">{{$title}} for {{ctl.getUser().id}}</h3>
+
 <div class="container">
   <div class="row">
-    <div class="col l6">
+    <div class="col l3 clock">
       <i class="fa fa-clock-o"></i>
       <span ng-click="ctl.tick()" ng-dblclick="ctl.clock()">{{ctl.now() | date:'longDate'}}</span>
     </div>
 
-    <div class="col l6 right-align">
+    <div class="col l9 right-align endpoint">
       <i class="fa fa-bars"></i>
       <span class="text-danger">{{ctl.getUser().endpoint}}</span>
     </div>

@@ -10,10 +10,15 @@ function MarketController($scope, $log, $interval, $uibModal, $rootScope,
   
   var init = function() {
     ctl.reload();
-    $rootScope.$on('chainblock', function(payload){
-          ctl.reload();
-    });
   };
+
+  $rootScope.$on('chainblock', function(payload){
+    ctl.reload();
+  });
+
+  $rootScope.$on('userchanged', function(){
+    ctl.reload();
+  });
 
   ctl.reload = function(){
     PeerService.getOffers().then(function(list) {

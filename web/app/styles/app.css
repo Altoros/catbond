@@ -3,18 +3,34 @@
   text-align: center;
 }
 
-nav .title {
+.top-nav {
+  margin-left: 0;
+}
+
+.nav-wrapper {
+  line-height: 64px;
+  padding: 0 30px;
+}
+
+.nav-wrapper .logo {
+  float: left;
+}
+
+.nav-wrapper .logo img {
+  height: 64px;
+  vertical-align: top;
+}
+
+.nav-wrapper .menu {
+  display: inline-block;
+}
+
+.nav-wrapper .title {
+  float: right;
   font-family: "BaronFont";
   font-size: xx-large;
-}
-
-.top-nav {
-  margin-left: 20px;
-}
-
-.nav-wrapper a.brand-logo img {
-  height: 30px;
-  left: 25px;
+  vertical-align: middle;
+  padding-top: 2px;
 }
 
 .foot3 .f-cont {
@@ -28,7 +44,13 @@ html body .wrapper main {
 }
 
 .container {
-  padding: 6% 0;
+  padding: 2% 0;
+}
+
+@media screen and (max-width: 1024px) {
+  .nav-wrapper .logo {
+    float: right;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -37,8 +59,9 @@ html body .wrapper main {
     margin-bottom: -145px;
   }
 
-  .container {
-    padding: 4% 0;
+  .endpoint {
+    word-break: break-all;
+    text-align: left;
   }
 }
 
@@ -48,8 +71,8 @@ html body .wrapper main {
     margin-bottom: -137px;
   }
 
-  .container {
-    padding: 3% 0;
+  .nav-wrapper .logo img {
+    height: 54px;
   }
 }
 
@@ -68,4 +91,8 @@ nav .menu-active {
 
 [ng-click] {
   cursor: pointer;
+}
+
+td, th, .clock, .endpoint {
+  font-size: large;
 }

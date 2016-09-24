@@ -21,16 +21,24 @@
 <h3 class="modal-title">Buy Contract</h3>
 </div>
 <div class="modal-body">
-  <dl class="dl-horizontal">
-    <dt>contract</dt>
-    <dd>{{ctl.trade.contractId}}</dd>
-    <dt>seller</dt>
-    <dd>{{ctl.trade.sellerId}}</dd>
-    <dt>price</dt>
-    <dd>{{ctl.trade.price}}</dd>
-    <dt>trade id</dt>
-    <dd>{{ctl.trade.id}}</dd>
-  </dl>
+  <table class="table-bordered highlight responsive-table">
+    <tr>
+      <td>Contract</td>
+      <td>{{ctl.trade.contractId}}</td>
+    </tr>
+    <tr>
+      <td>seller</td>
+      <td>{{ctl.trade.sellerId}}</td>
+    </tr>
+    <tr>
+      <td>price</td>
+      <td>{{ctl.trade.price}}</td>
+    </tr>
+    <tr>
+      <td>trade id</td>
+      <td>{{ctl.trade.id}}</td>
+    </tr>
+  </table>
 </div>
 <div class="modal-footer">
 <button class="btn btn-primary" type="button" 

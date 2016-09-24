@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hyperledger Catastrophe Bond PoC</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+    <link type="image/x-icon" rel="shortcut icon" href="images/altoros.png">
 
     <!-- Page styles -->
 
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
+    <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
+    <link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
 
     <!-- build:css styles/app.min.css -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="styles/material-design-iconic-font.css"/>
     <link type="text/css" rel="stylesheet" href="styles/main.css"/>
     <link type="text/css" rel="stylesheet" href="styles/app.css"/>
@@ -27,65 +27,65 @@
     <div class="wrapper vertical-sidebar">
       <header id="header">
         <nav>
-          <div class="nav-wrapper">
-            <a href="#" class="brand-logo"><img src="images/logo.png" alt="Catastrophe Bond"></a>
-            <div class="center title hide-on-med-and-down">Catastrophe Bond</div>
+          <div class="nav-wrapper center">
             <a href="#" sidenav data-activates="nav-mobile" class="button-collapse top-nav full waves-effect waves-light hide-on-large-only">
               <i class="material-icons">menu</i>
             </a>
-            <div class="header-right">
-              <ul class="right-ul right hide-on-med-and-down" ng-controller="DemoController as ctl">
-                <li ng-show="ctl.user.role === 'issuer'">
-                  <a ui-sref="demo.issuerContractList" ui-sref-active="menu-active">Contracts</a>
-                </li>
-                <li ng-show="ctl.user.role === 'issuer'">
-                  <a ui-sref="demo.bondList" ui-sref-active="menu-active">Bonds</a>
-                </li>
-                <li ng-show="ctl.user.role === 'investor'">
-                  <a ui-sref="demo.investorContractList" ui-sref-active="menu-active">Contracts</a>
-                </li>
-                <li ng-show="ctl.user.role === 'investor'">
-                  <a ui-sref="demo.market" ui-sref-active="menu-active">Market</a>
-                </li>
-                <li ng-show="ctl.user.role === 'bank'">
-                  <a ui-sref="demo.offline" ui-sref-active="menu-active">Offline payments</a>
-                </li>
-                <li>
-                  <a class="dropdown-button drop-down-profile relative-item" href="#" data-activates="dropdown7" data-beloworigin="true">
-                    {{ctl.user.id}}
-                    <img class="responsive-img profile-img" src="images/users/john.png" alt="john">
-                    <i class="zmdi zmdi-caret-down drop-down-icon"></i>
-                  </a>
-                  <ul id="dropdown7" class="dropdown-content">
-                    <li ng-repeat="u in ctl.users" ng-class="{active: ctl.user.id == u.id}">
-                      <a href="#" ng-click="ctl.user = u; ctl.setUser()">{{u.id}}</a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
+
+            <a class="logo" href="#"><img src="images/altoros.png" alt="Catastrophe Bond"></a>
+
+            <ul class="menu hide-on-med-and-down" ng-controller="DemoController as ctl">
+              <li ng-show="ctl.getUser().role === 'issuer'">
+                <a ui-sref="demo.issuerContractList" ui-sref-active="menu-active">Contracts</a>
+              </li>
+              <li ng-show="ctl.getUser().role === 'issuer'">
+                <a ui-sref="demo.bondList" ui-sref-active="menu-active">Bonds</a>
+              </li>
+              <li ng-show="ctl.getUser().role === 'investor'">
+                <a ui-sref="demo.investorContractList" ui-sref-active="menu-active">Contracts</a>
+              </li>
+              <li ng-show="ctl.getUser().role === 'investor'">
+                <a ui-sref="demo.market" ui-sref-active="menu-active">Market</a>
+              </li>
+              <li ng-show="ctl.getUser().role === 'bank'">
+                <a ui-sref="demo.offline" ui-sref-active="menu-active">Offline payments</a>
+              </li>
+              <li>
+                <a class="dropdown-button drop-down-profile relative-item" href="#" data-activates="dropdown7" data-beloworigin="true">
+                  {{ctl.getUser().id}}
+                  <i class="zmdi zmdi-caret-down drop-down-icon"></i>
+                </a>
+                <ul id="dropdown7" class="dropdown-content">
+                  <li ng-repeat="u in ctl.users" ng-class="{active: ctl.getUser().id == u.id}">
+                    <a href="#" ng-click="ctl.user = u; ctl.setUser()">{{u.id}}</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+
+            <div class="title hide-on-med-and-down">Catastrophe Bond</div>
           </div>
         </nav>
       </header>
       <aside class="sidebar-left" side-bar="" ng-controller="DemoController as ctl">
         <ul class="side-nav fixed clearfix left" id="nav-mobile">
-          <li ng-show="ctl.user.role === 'issuer'">
+          <li ng-show="ctl.getUser().role === 'issuer'">
             <a ui-sref="demo.issuerContractList" ui-sref-active="menu-active">Contracts</a>
           </li>
-          <li ng-show="ctl.user.role === 'issuer'">
+          <li ng-show="ctl.getUser().role === 'issuer'">
             <a ui-sref="demo.bondList" ui-sref-active="menu-active">Bonds</a>
           </li>
-          <li ng-show="ctl.user.role === 'investor'">
+          <li ng-show="ctl.getUser().role === 'investor'">
             <a ui-sref="demo.investorContractList" ui-sref-active="menu-active">Contracts</a>
           </li>
-          <li ng-show="ctl.user.role === 'investor'">
+          <li ng-show="ctl.getUser().role === 'investor'">
             <a ui-sref="demo.market" ui-sref-active="menu-active">Market</a>
           </li>
-          <li ng-show="ctl.user.role === 'bank'">
+          <li ng-show="ctl.getUser().role === 'bank'">
             <a ui-sref="demo.offline" ui-sref-active="menu-active">Offline payments</a>
           </li>
           <h5 class="center">Current user</h5>
-          <li ng-repeat="u in ctl.users" ng-class="{active: ctl.user.id == u.id}">
+          <li ng-repeat="u in ctl.users" ng-class="{active: ctl.getUser().id == u.id}">
             <a href="#" ng-click="ctl.user = u; ctl.setUser()">{{u.id}}</a>
           </li>
         </ul>
@@ -114,7 +114,7 @@
     </div>
 
     <!--  cdn with fallback -->
-    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="//cdn.socket.io/socket.io-1.4.5.js"></script>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="bower_components/jquery/dist/jquery.min.js"><\/script>')</script>
@@ -131,12 +131,13 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
     <script>window.angular || document.write('<script src="bower_components/angular-ui-bootstrap/ui-bootstrap-tpls.min.js"><\/script>')</script>
 
-    <script src="scripts/angular-local-storage.min.js"></script>
 
     <!-- build:vendor scripts/vendor.min.js -->
+    <script type="text/javascript" src="scripts/angular-local-storage.min.js"></script>
     <script type="text/javascript" src="scripts/materialize.js"></script>
     <script type="text/javascript" src="scripts/angular-materialize.js"></script>
     <script type="text/javascript" src="scripts/mara.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-ui-router-title/angular-ui-router-title.js"></script>
     <!-- endbuild -->
 
     <!-- build:js scripts/app.min.js -->

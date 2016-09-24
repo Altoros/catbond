@@ -10,10 +10,15 @@ function InvestorContractListController($scope, $log, $interval, $uibModal, $roo
   
   var init = function() {
     ctl.reload();
-    $rootScope.$on('chainblock', function(payload){
-          ctl.reload();
-    });
   };
+
+  $rootScope.$on('chainblock', function(payload){
+    ctl.reload();
+  });
+
+  $rootScope.$on('userchanged', function(){
+    ctl.reload();
+  });
 
   ctl.reload = function(){
     PeerService.getContracts().then(function(list) {
