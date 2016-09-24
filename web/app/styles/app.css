@@ -17,8 +17,8 @@
 }
 
 .nav-wrapper .logo img {
-  height: 30px;
-  vertical-align: middle;
+  height: 64px;
+  vertical-align: top;
 }
 
 .nav-wrapper .menu {
@@ -58,12 +58,21 @@ html body .wrapper main {
     padding-bottom: 145px;
     margin-bottom: -145px;
   }
+
+  .endpoint {
+    word-break: break-all;
+    text-align: left;
+  }
 }
 
 @media screen and (max-width: 600px) {
   html body .wrapper main {
     padding-bottom: 137px;
     margin-bottom: -137px;
+  }
+
+  .nav-wrapper .logo img {
+    height: 54px;
   }
 }
 
@@ -84,6 +93,6 @@ nav .menu-active {
   cursor: pointer;
 }
 
-td, th {
+td, th, .clock, .endpoint {
   font-size: large;
 }
