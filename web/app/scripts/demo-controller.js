@@ -4,7 +4,7 @@
  * @ngInject
  */
 function DemoController($log, $state, 
-    cfg, TimeService, UserService, PeerService) {
+    cfg, TimeService, UserService, PeerService, $rootScope) {
 
   var ctl = this;
 
@@ -19,6 +19,8 @@ function DemoController($log, $state,
   ctl.clock = function() {
     TimeService.clock();
   };
+
+  ctl.getUser = UserService.getUser;
   
   ctl.user = UserService.getUser();
 
@@ -38,7 +40,11 @@ function DemoController($log, $state,
             $state.go('demo.offline');
             break;
     }
+
+    $rootScope.$emit('userchanged');
   };
+
+  ctl.setUser();
 
 }
 

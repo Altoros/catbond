@@ -1,19 +1,20 @@
+window.disableThemeSettings = true;
 angular.module('config', [])
 .constant('cfg', 
     {
-  endpoint: 'http://vp2.altoros.com:7050/chaincode',
+  endpoint: 'http://vp1.altoros.com:7050/chaincode',
   secureContext: 'user_type1_deadbeef',
-  chaincodeID: "32e8308c13e647f8e430096e148a767cf22376fa76a519f5fdfe8c5758154ab03650b87e65ff7148b5289f7d9bdb9c7b7c829be7c7564a9abf512124a0b337a3",
+  chaincodeID: "f3612a330cb852ef1c63153af587e905d4714f52f928068ce1d9609a917a834c63123049c359875784fb4114d09d799d78475b08c7b66a7f7d1daba0578aacc5",
 //  users: [{id: 'issuer0', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
 //          {id: 'issuer1', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
 //          {id: 'investor0', role: 'investor', endpoint:'http://localhost:7050/chaincode'},
 //          {id: 'investor1', role: 'investor', endpoint:'http://localhost:7050/chaincode'},
 //          {id: 'auditor0', role: 'auditor', endpoint:'http://localhost:7050/chaincode'}],
-  users: [{id: 'issuer0', role: 'issuer', endpoint:'http://catbond.altoros.com:7050/chaincode'},
-          {id: 'issuer1', role: 'issuer', endpoint:'http://catbond.altoros.com:7050/chaincode'},
-          {id: 'investor0', role: 'investor', endpoint:'http://swift.altoros.com:7050/chaincode'},
-          {id: 'investor1', role: 'investor', endpoint:'http://swift.altoros.com:7050/chaincode'},
-          {id: 'auditor0', role: 'auditor', endpoint:'http://52.91.72.177:7050/chaincode'}],
+  users: [{id: 'issuer0', role: 'issuer', endpoint:'http://vp1.altoros.com:7050/chaincode'},
+          {id: 'issuer1', role: 'issuer', endpoint:'http://vp1.altoros.com:7050/chaincode'},
+          {id: 'investor0', role: 'investor', endpoint:'http://vp2.altoros.com:7050/chaincode'},
+          {id: 'investor1', role: 'investor', endpoint:'http://vp2.altoros.com:7050/chaincode'},
+          {id: 'auditor0', role: 'auditor', endpoint:'http://vp3:7050/chaincode'}],
   triggers: ['hurricane 2 FL', 'earthquake 5 CA'],
   bonds: [{
             id: 'issuer0.2017.6.13.600',

@@ -9,10 +9,15 @@ function BondListController($scope, $log, $interval, $uibModal, PeerService, $ro
   
   var init = function() {
     ctl.reload();
-    $rootScope.$on('chainblock', function(payload){
-          ctl.reload();
-    });
   };
+
+  $rootScope.$on('chainblock', function(payload){
+    ctl.reload();
+  });
+
+  $rootScope.$on('userchanged', function(){
+    ctl.reload();
+  });
 
   ctl.reload = function(){
     PeerService.getBonds().then(function(list) {

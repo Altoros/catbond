@@ -21,6 +21,8 @@ function PeerService($log, $q, $http, cfg, UserService) {
       'id': 0
   };
 
+  var isLoading = {};
+
 
   PeerService.buy = function(tradeId) {
     return invoke('buy', ['' + tradeId]);
@@ -98,8 +100,10 @@ function PeerService($log, $q, $http, cfg, UserService) {
 
   var query = function(functionName, functionArgs) {
     $log.debug('PeerService.query');
+    if(isLoading[functionName] && isLoading[functionName].$$state.pending) return isLoading[functionName];
 
     var d = $q.defer();
+    isLoading[functionName] = d.promise;
 
     payload.method = 'query';
 //    payload.params.ctorMsg['function'] = functionName;

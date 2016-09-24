@@ -1,4 +1,4 @@
-<table class="table">
+<table class="table-bordered highlight responsive-table">
   <thead>
 	  <tr>
 	    <th>bond</th>
@@ -10,11 +10,6 @@
 	    <th>state</th>
 	  </tr>
   </thead>
-  <tfoot>
-    <tr>
-      <td colspan="7"><button class="btn btn-primary" ng-click="ctl.open()">Issue Bond</button></td>
-    </tr>
-  </tfoot>
   <tbody>
 	  <tr ng-repeat="o in ctl.list">
 	    <td>{{o.id}}</td>
@@ -27,6 +22,10 @@
 	  </tr>
   </tbody>
 </table>
+
+<p>
+  <button class="btn btn-primary" ng-click="ctl.open()">Issue Bond</button>
+</p>
 
 <script type="text/ng-template" id="create-bond-modal.html">
 <div class="modal-header">
@@ -54,8 +53,7 @@
   </div>
   <div class="form-group">
     <label>catastrophe trigger</label>
-    <select class="form-control" 
-    ng-model="ctl.bond.trigger" ng-options="o for o in ctl.triggers"></select>
+    <select ng-model="ctl.bond.trigger" material-select watch ng-options="o for o in ctl.triggers"></select>
   </div>
 </div>
 <div class="modal-footer">

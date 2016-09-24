@@ -2,57 +2,20 @@
   <blockchain-log> </blockchain-log>
 </div>
 
+<h3 class="center">{{$title}} for {{ctl.getUser().id}}</h3>
+
 <div class="container">
-
   <div class="row">
-    <div class="col-md-3">
-      <h1>CatBond</h1>
-    </div><!-- /column -->
-    <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading"><i class="fa fa-bars"></i><span class="text-danger">  {{ctl.user.endpoint}}</span></div>
-        <div class="panel-body">
-          <ul ng-if="ctl.user.role === 'issuer'" class="list-inline">
-            <li><a ui-sref="demo.issuerContractList" ui-sref-active="menu-active">Contracts</a></li>
-            <li><a ui-sref="demo.bondList" ui-sref-active="menu-active">Bonds</a></li>
-          </ul>
-          <ul ng-if="ctl.user.role === 'investor'" class="list-inline">
-            <li><a ui-sref="demo.investorContractList" ui-sref-active="menu-active">Contracts</a></li>
-            <li><a ui-sref="demo.market" ui-sref-active="menu-active">Market</a></li>
-          </ul>
-          <ul ng-if="ctl.user.role === 'bank'" class="list-inline">
-            <li><a ui-sref="demo.offline" ui-sref-active="menu-active">Offline payments</a></li>
-          </ul>
-        </div>
-      </div>
-    </div><!-- /column -->
-    <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading"><i class="fa fa-user"></i> Logged in User</div>
-        <div class="panel-body">
+    <div class="col l6">
+      <i class="fa fa-clock-o"></i>
+      <span ng-click="ctl.tick()" ng-dblclick="ctl.clock()">{{ctl.now() | date:'longDate'}}</span>
+    </div>
 
+    <div class="col l6 right-align">
+      <i class="fa fa-bars"></i>
+      <span class="text-danger">{{ctl.getUser().endpoint}}</span>
+    </div>
+  </div>
 
-
-          <select class="form-control" ng-model="ctl.user"
-          ng-options="u.id for u in ctl.users"
-          ng-change="ctl.setUser()"></select>
-
-
-        </div>
-      </div>
-    </div><!-- /column -->
-    <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading"><i class="fa fa-clock-o"></i> Current Date</div>
-        <div class="panel-body" ng-click="ctl.tick()" ng-dblclick="ctl.clock()">
-          <h5>{{ctl.now() | date:'longDate'}}</h5>
-        </div>
-      </div>
-    </div><!-- /column -->
-  </div><!-- /row -->
-  <div class="row">
-    <div class="col-md-12">
-      <ui-view/>
-    </div><!-- /column -->
-  </div><!-- /row -->
+  <ui-view/>
 </div>
