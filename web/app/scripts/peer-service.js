@@ -93,7 +93,7 @@ function PeerService($log, $q, $http, cfg, UserService) {
 
     $log.debug('payload', payload);
 
-    return $http.post(UserService.getUser().endpoint, angular.copy(payload)).then(function(data) {
+    return $http.post(cfg.endpoint, angular.copy(payload)).then(function(data) {
       $log.debug('result', data.data.result);
     });
   };
