@@ -32,7 +32,7 @@ angular.module('app', ['ui.router',
     templateUrl: 'partials/issuer-contract-list.html',
     controller: 'IssuerContractListController as ctl',
     resolve: {
-      $title: function(UserService) { return 'Contracts'; }
+      $title: function(UserService) { return 'Contracts of'; }
     }
   })
   .state('demo.investorContractList', {
@@ -40,7 +40,7 @@ angular.module('app', ['ui.router',
     templateUrl: 'partials/investor-contract-list.html',
     controller: 'InvestorContractListController as ctl',
     resolve: {
-      $title: function(UserService) { return 'Contracts'; }
+      $title: function(UserService) { return 'Contracts of'; }
     }
   })
   .state('demo.bondList', {
@@ -48,7 +48,7 @@ angular.module('app', ['ui.router',
     templateUrl: 'partials/bond-list.html',
     controller: 'BondListController as ctl',
     resolve: {
-      $title: function(UserService) { return 'List of bonds'; }
+      $title: function(UserService) { return 'Bonds of'; }
     }
   })
   .state('demo.market', {
@@ -56,7 +56,7 @@ angular.module('app', ['ui.router',
     templateUrl: 'partials/market.html',
     controller: 'MarketController as ctl',
     resolve: {
-      $title: function(UserService) { return 'Traids on the market'; }
+      $title: function(UserService) { return 'Market for'; }
     }
   })
   .state('demo.offline', {
