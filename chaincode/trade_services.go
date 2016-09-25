@@ -24,7 +24,7 @@ type trade struct {
 }
 
 func (t *BondChaincode) GetSwiftChaincodeToCall() string {
-	chainCodeToCall := "1f8052f0a64a12bb4f59cd5b5cd916fa7fe1aee929cf629c0e0f6eabb9d7f819c7cb5d39ad965e2c658d6e63c344fd7e655ff400ee34390e66650d60dabc2b64"
+	chainCodeToCall := "2fe5ccdb43c37c2bab0156dc1023906166eee22c6a206befd396f5b3937a7988aa8163acca704b1cd1949e217c9404a644a8aa191334b26c8846284aab48de8e"
 	return chainCodeToCall
 }
 
