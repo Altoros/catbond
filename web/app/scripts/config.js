@@ -4,7 +4,7 @@ angular.module('config', [])
     {
   endpoint: 'http://vp1.altoros.com:7050/chaincode',
   secureContext: 'user_type1_deadbeef',
-  chaincodeID: "f3612a330cb852ef1c63153af587e905d4714f52f928068ce1d9609a917a834c63123049c359875784fb4114d09d799d78475b08c7b66a7f7d1daba0578aacc5",
+  chaincodeID: "395026cb60bdb363672abfe16b56c3d165a438f1063ec5d3a9a067daec776c7b762fd3ed3f5c2a6ce5fb5468873a293b44026119f89dce8a3ea42648c8c59dcd",
 //  users: [{id: 'issuer0', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
 //          {id: 'issuer1', role: 'issuer', endpoint:'http://localhost:7050/chaincode'},
 //          {id: 'investor0', role: 'investor', endpoint:'http://localhost:7050/chaincode'},
@@ -14,7 +14,7 @@ angular.module('config', [])
           {id: 'issuer1', role: 'issuer', endpoint:'http://vp1.altoros.com:7050/chaincode'},
           {id: 'investor0', role: 'investor', endpoint:'http://vp2.altoros.com:7050/chaincode'},
           {id: 'investor1', role: 'investor', endpoint:'http://vp2.altoros.com:7050/chaincode'},
-          {id: 'auditor0', role: 'auditor', endpoint:'http://vp3:7050/chaincode'}],
+          {id: 'auditor0', role: 'auditor', endpoint:'http://vp3.altoros.com:7050/chaincode'}],
   triggers: ['hurricane 2 FL', 'earthquake 5 CA'],
   bonds: [{
             id: 'issuer0.2017.6.13.600',
