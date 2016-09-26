@@ -3,12 +3,16 @@
  * @classdesc
  * @ngInject
  */
-function TimeService($log, $interval, cfg, PeerService, localStorageService) {
+function TimeService($log, $interval, cfg, PeerService, localStorageService, $rootScope) {
 
   // jshint shadow: true
   var TimeService = this;
 
   TimeService.now = new Date(2016, 5, 1, 12, 0);
+
+  $rootScope.$on('chainblock', function(e, payload){
+    TimeService.now = new Date(payload.year, payload.month, 1, 12, 0);
+  });
 
   var clockStepMonths = 1;
 
