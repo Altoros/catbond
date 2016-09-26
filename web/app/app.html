@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Hyperledger Catastrophe Bond PoC</title>
 
-  <link type="image/x-icon" rel="shortcut icon" href="images/altoros.png">
+  <link type="image/x-icon" rel="shortcut icon" href="images/favicon.png">
 
   <!-- Page styles -->
 
@@ -32,7 +32,10 @@
           <i class="material-icons">menu</i>
         </a>
 
-        <a class="logo" href="#"><img src="images/altoros.png" alt="Catastrophe Bond"></a>
+        <a class="logo" href="#">
+          <img class="hide-on-med-and-down" src="images/logo.png" alt="Catastrophe Bond">
+          <img class="hide-on-large-only" src="images/logo-small.png" alt="Catastrophe Bond">
+        </a>
 
         <ul class="menu hide-on-med-and-down" ng-controller="DemoController as ctl">
           <li ng-show="ctl.getUser().role === 'issuer'">
